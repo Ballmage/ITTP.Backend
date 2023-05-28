@@ -32,8 +32,10 @@ namespace ITTP.WebApi
             }
             app.UseSwagger();
             app.UseSwaggerUI();
-            
+            app.UseRouting();
             app.UseAuthorization();
+            
+
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -43,6 +45,11 @@ namespace ITTP.WebApi
                 context.Database.EnsureDeleted();
                 context.Database.Migrate();
             }
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
         }
     }
