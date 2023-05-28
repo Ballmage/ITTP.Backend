@@ -1,12 +1,10 @@
+using ITTP.Persistance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ITTP.WebApi
 {
@@ -16,6 +14,13 @@ namespace ITTP.WebApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddDbContextPool<ITTPDbContext>(options =>
+            options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=TestDB;Trusted_Connection=True;"));
+
+            services.AddControllers();
+            services.AddSwaggerGen();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -25,16 +30,20 @@ namespace ITTP.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            
+            app.UseAuthorization();
+            using (var scope = app.ApplicationServices.CreateScope())
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });
+                var services = scope.ServiceProvider;
+
+                var context = services.GetRequiredService<ITTPDbContext>();
+
+                context.Database.EnsureDeleted();
+                context.Database.Migrate();
+            }
+
         }
     }
 }

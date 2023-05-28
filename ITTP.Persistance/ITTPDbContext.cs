@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITTP.Persistance
 {
-    class ITTPDbContext : DbContext
+    public class ITTPDbContext : DbContext
     {
         public ITTPDbContext(DbContextOptions options) : base(options)
         { }
@@ -19,7 +19,7 @@ namespace ITTP.Persistance
         {
             if (!optionsBuilder.IsConfigured)
             {
-                string connectionString = @"server=.\sqlexpress;database=TestDB;
+                string connectionString = @"server=(localdb)\mssqllocaldb;database=TestDB;
                     integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
 
                 optionsBuilder.UseSqlServer(connectionString);
